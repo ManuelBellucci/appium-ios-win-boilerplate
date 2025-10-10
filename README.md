@@ -143,7 +143,7 @@ python e2eios\scripts\test_connection.py
 ## 📁 Project Structure
 
 ```
-appium-ios-boilerplate/
+appium-ios-win-boilerplate/
 ├── 📂 e2eios/
 │   ├── 📂 config/
 │   │   ├── 📄 .env.example          # Environment template
