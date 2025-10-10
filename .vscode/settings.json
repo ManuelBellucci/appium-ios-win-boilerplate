@@ -1,0 +1,9 @@
+{
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#2C3010",
+        "titleBar.activeBackground": "#3E4317",
+        "titleBar.activeForeground": "#F9FBF2"
+    },
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "python-envs.pythonProjects": []
+}

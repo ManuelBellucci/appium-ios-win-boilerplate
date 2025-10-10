@@ -1,0 +1,12 @@
+{
+  "platformName": "iOS",
+  "appium:automationName": "XCUITest",
+  "appium:udid": "YOUR_UDID",
+  "appium:webDriverAgentUrl": "http://127.0.0.1:8200",
+  "appium:bundleId": "YOUR_APP_BUNDLE_ID",
+  "appium:noReset": true,
+  "appium:autoAcceptAlerts": true,
+  "appium:newCommandTimeout": 120,
+  "appium:includeSafariInWebviews": true,
+  "appium:connectHardwareKeyboard": true
+}

@@ -1,0 +1,12 @@
+# ==========================================
+# APPIUM THREADS - SINGLE DEVICE FOCUS
+# Human Simulation iOS Automation
+# ==========================================
+
+# === CORE APPIUM & WEBDRIVER ===
+Appium-Python-Client==5.2.4
+selenium>=4.15.0
+
+# === TESTING FRAMEWORK ===
+pytest>=7.4.0
+pytest-html>=4.1.0
