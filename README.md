@@ -10,12 +10,16 @@
 ## 🚀 Features
 
 - ✅ **Complete iOS Device Management** - Automated device setup and WebDriverAgent deployment
-- 🎮 **GUI Control Panel** - User-friendly interface with dark mode console
+- 🎮 **Enhanced GUI Control Panel** - User-friendly interface with dark mode console and advanced controls
 - 🔧 **PowerShell Automation** - Streamlined service management scripts
-- 📊 **Real-time Monitoring** - Live status checking for all services
-- 🧪 **Connection Testing** - Built-in validation tools
+- 📊 **Real-time Monitoring** - Live status checking for all services with health indicators
+- 🧪 **Connection Testing** - Built-in validation tools with detailed diagnostics
 - 📝 **Comprehensive Logging** - Detailed logging with timestamps and color coding
-- 🔄 **Auto-recovery** - Robust error handling and service restart capabilities
+- 🔄 **Advanced Auto-Recovery** - Intelligent service restart, device reconnection, and health monitoring
+- ⌨️ **Configurable Shortcuts** - Customizable keyboard shortcuts for all panel actions
+- 🎯 **Service-Specific Recovery** - Individual service health monitoring and targeted recovery
+- 💾 **Log Export & Management** - Export console logs and manage automation history
+- 🔧 **Script Integration** - Direct execution of automation scripts from panel
 
 ## 📋 Prerequisites
 
@@ -148,14 +152,17 @@ appium-ios-win-boilerplate/
 │   ├── 📂 config/
 │   │   ├── 📄 .env.example          # Environment template
 │   │   ├── 📄 .env                  # Your configuration
+│   │   ├── 📄 shortcuts.json        # Configurable keyboard shortcuts
 │   │   └── 📄 app_config.json       # Optional app-specific config
 │   ├── 📂 scripts/
-│   │   ├── 🎮 control_panel.py      # GUI Control Panel
+│   │   ├── 🎮 control_panel.py      # Enhanced GUI Control Panel with auto-recovery
 │   │   ├── 🔍 test_connection.py    # Connection validator
 │   │   └── ⚙️ open_settings.py      # Sample automation script
 │   └── 📂 utils/
 │       ├── 📝 logger.py             # Logging utilities
-│       └── 🔧 env.py                # Environment loader
+│       ├── 🔧 env.py                # Environment loader
+│       ├── 🔄 auto_recovery.py      # Auto-recovery system
+│       └── ⌨️ shortcuts.py          # Shortcuts manager
 ├── 📂 tools/
 │   ├── 🚀 start.ps1                 # Service startup script
 │   └── 🛑 stop.ps1                  # Service shutdown script
@@ -193,9 +200,15 @@ This process involves **two phases**:
 1. **📦 Compilation Phase** (macOS with Xcode) - Build the WDA app
 2. **📱 Deployment Phase** (Windows with iPhone) - Sideload and run automation
 
-#### 📦 **Phase 1: Compilation on macOS (Developer/Team Member)**
+#### 📦 **Phase 1: Complete WebDriverAgent Compilation Guide (macOS)**
 
-> **👨‍💻 This phase requires a Mac with Xcode and should be done by someone with macOS access**
+> **👨‍💻 This comprehensive guide covers the ENTIRE process from start to finish**
+
+##### **Prerequisites**
+- **macOS with Xcode 12.0+** installed
+- **Active Apple Developer Account** ($99/year)
+- **Command Line Tools** installed
+- **Node.js 16+** installed
 
 ##### **Step 1: Download and Setup WebDriverAgent**
 
@@ -208,62 +221,188 @@ This process involves **two phases**:
 2. **Install Dependencies**:
    ```bash
    npm install
-   ./Scripts/bootstrap.sh
+   # Note: bootstrap.sh script may not exist in newer versions - npm install is sufficient
    ```
 
-##### **Step 2: Configure Xcode Project**
+3. **Open Xcode Project**:
+   ```bash
+   open WebDriverAgent.xcodeproj
+   ```
 
-1. **Open Project in Xcode**:
-   - Open `WebDriverAgent.xcodeproj` in Xcode
-   - You'll see multiple targets in the project
+##### **Step 2: Apple Developer Account Setup**
 
-2. **Select Development Team**:
-   - Select `WebDriverAgentLib` target
-   - Go to **Signing & Capabilities** tab
-   - Select your **Apple Developer Team**
-   - Repeat for `WebDriverAgentRunner` and `WebDriverAgent` targets
-
-3. **Configure Bundle Identifiers**:
-   
-   **For WebDriverAgentRunner target**:
-   - Change Bundle Identifier from `com.facebook.WebDriverAgentRunner` 
-   - To: `com.yourcompany.WebDriverAgentRunner` (use your own domain)
-   
-   **For WebDriverAgent target**:
-   - Change Bundle Identifier from `com.facebook.WebDriverAgent`
-   - To: `com.yourcompany.WebDriverAgent`
-   - You can put whatever you want to be honest, an alias too.
-4. **Register Target Device UDIDs**:
-   - Collect UDIDs from Windows machines that will use the automation. You can connect the iPhone to the Windows and get UDID by go-ios on console or iTunes (DO NOT download from Microsoft Store, download official .exe instead)
+1. **Create App IDs** (Apple Developer Portal):
    - Go to [Apple Developer Portal](https://developer.apple.com/account)
-   - Navigate to **Certificates, Identifiers & Profiles** > **Devices**
-   - Add all target device UDIDs to your provisioning profile
+   - Navigate to **Certificates, Identifiers & Profiles** → **Identifiers**
+   - Click **"+"** to create new App ID
+   - Select **"App"** and click **"Continue"**
+   - Create these App IDs:
+     - Description: `WebDriverAgent Runner` | Bundle ID: `com.yourname.WebDriverAgentRunner`
+     - Description: `WebDriverAgent Lib` | Bundle ID: `com.yourname.WebDriverAgentLib`
 
-##### **Step 3: Build WebDriverAgent (Archive Method)**
+2. **Register Target Device UDIDs**:
+   - In Developer Portal: **Certificates, Identifiers & Profiles** → **Devices**
+   - Click **"+"** to register new device
+   - Get UDID from: iTunes, go-ios, or Xcode (Window → Devices and Simulators)
+   - Add all iPhones that will use this automation
 
-> **📝 Note**: You DON'T need to connect the target iPhone to the Mac. You're just building the app.
+3. **Create Provisioning Profile**:
+   - Go to **Certificates, Identifiers & Profiles** → **Profiles**
+   - Click **"+"** to create new profile
+   - Select **"iOS App Development"**
+   - Choose your App ID (`com.yourname.WebDriverAgentRunner`)
+   - Select your development certificate
+   - Select all target devices
+   - Name it: `WebDriverAgent Development`
+   - Download and install the profile
 
-1. **Select Generic iOS Device**:
-   - In Xcode, select **"Any iOS Device (arm64)"** as target
-   - This builds a universal app that can be deployed to any registered device
+##### **Step 3: Xcode Project Configuration**
 
-2. **Build for Archive**:
-   - Select `WebDriverAgentRunner` scheme
-   - Click **Product** > **Archive**
-   - This creates a distributable `.ipa` file
+1. **Configure WebDriverAgentRunner Target**:
+   - Select **WebDriverAgentRunner** target in project navigator
+   - Go to **"Signing & Capabilities"** tab
+   - **Team**: Select your Apple Developer team
+   - **Bundle Identifier**: Change to `com.yourname.WebDriverAgentRunner`
+   - **Automatically manage signing**: ✅ Checked
+   - Verify: **Signing Certificate** shows "Apple Development: YOUR_NAME"
+   - Verify: **Provisioning Profile** shows "Xcode Managed Profile"
 
-3. **Export IPA**:
-   - In the Organizer window, select your archive
+2. **Configure WebDriverAgentLib Target**:
+   - Select **WebDriverAgentLib** target
+   - **Team**: Select your Apple Developer team  
+   - **Bundle Identifier**: Change to `com.yourname.WebDriverAgentLib`
+   - **Automatically manage signing**: ✅ Checked
+   - Verify: **Provisioning Profile** shows "None Required" (normal for libraries)
+
+3. **Verify Configuration**:
+   - Ensure both targets show **green checkmarks** (no red errors)
+   - Both should use the same development team
+   - Bundle identifiers should be unique and match your Apple Developer setup
+
+##### **Step 4: Build and Export WebDriverAgent**
+
+1. **Select Build Target**:
+   - **Scheme**: Select `WebDriverAgentRunner` (top-left dropdown)
+   - **Destination**: Select `Any iOS Device (arm64)`
+
+2. **Build the Project**:
+   ```bash
+   # First, build to ensure everything works
+   # In Xcode: Product → Build (⌘+B)
+   ```
+   - Wait for **"Build Succeeded"** message
+   - Enter your Mac login password when prompted for keychain access
+
+3. **Create Archive**:
+   ```bash
+   # In Xcode: Product → Archive
+   ```
+   - Wait for archive to complete
+   - Organizer window will open automatically
+
+4. **Export the App**:
+   - In **Organizer**, select your WebDriverAgent archive
    - Click **"Distribute App"**
+   - Select **"Archive"** (not "Built Products")
+   - Click **"Next"**
    - Choose **"Development"** distribution
    - Select your team and provisioning profile
-   - Export the `.ipa` file
+   - Click **"Export"** and choose save location
 
-4. **Package for Distribution**:
-   Create a package containing:
-   - 📄 `WebDriverAgentRunner.ipa` (the built app)
-   - 📄 Bundle ID information (e.g., `com.yourcompany.WebDriverAgentRunner`)
-   - 📄 Installation instructions for Windows users
+##### **Step 5: Extract and Prepare Files**
+
+1. **Find the Built App**:
+   ```bash
+   # If export created a folder, look inside for:
+   # - WebDriverAgentRunner.app
+   # - OR navigate to the .xcarchive and extract manually
+   
+   # Alternative: Use Xcode to find build products
+   # Product → Show Build Folder in Finder
+   # Navigate to: Build/Products/Debug-iphoneos/WebDriverAgentRunner.app
+   ```
+
+2. **Create IPA File**:
+   ```bash
+   # Method 1: Simple rename (works for sideloading)
+   cp -R WebDriverAgentRunner.app WebDriverAgentRunner-Runner.ipa
+   
+   # Method 2: Proper IPA structure
+   mkdir Payload
+   cp -R WebDriverAgentRunner.app Payload/
+   zip -r WebDriverAgentRunner-Runner.ipa Payload/
+   rm -rf Payload/
+   ```
+
+##### **Step 6: Export Developer Certificate & Provisioning Profile**
+
+1. **Export Developer Certificate**:
+   - **Open Keychain Access**: Applications → Utilities → Keychain Access
+   - **Select "login" keychain** and click **"My Certificates"** category
+   - **Find Your Certificate**: Look for **"Apple Development: YOUR_NAME (TEAM_ID)"**
+   - **Click triangle** to expand and see the private key
+   - **Cmd+Click** to select both certificate and private key
+   - **Right-click** → **"Export 2 items..."**
+   - **File Format**: Select **"Personal Information Exchange (.p12)"**
+   - **Save As**: `developer.p12`
+   - **Set a password** (remember this!)
+   - **Save** and enter your Mac login password when prompted
+
+2. **Export Provisioning Profile**:
+   - **Method 1: From Apple Developer Portal**:
+     - Go to [Apple Developer Portal](https://developer.apple.com/account)
+     - Navigate to **Certificates, Identifiers & Profiles** → **Profiles**
+     - Find your **"WebDriverAgent Development"** profile
+     - Click **"Download"** to get the `.mobileprovision` file
+   
+   - **Method 2: From Xcode**:
+     ```bash
+     # Find provisioning profiles in Xcode's directory
+     ls ~/Library/MobileDevice/Provisioning\ Profiles/
+     
+     # Copy all profiles to Desktop for easy access
+     cp ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision ~/Desktop/
+     ```
+   
+   - **Method 3: From Xcode Preferences**:
+     - **Xcode** → **Preferences** → **Accounts**
+     - **Select your Apple ID** → **Manage Certificates**
+     - **Right-click** your development certificate → **"Export"**
+     - This may also export associated provisioning profiles
+   - **File Format**: Select **"Personal Information Exchange (.p12)"**
+   - **Save As**: `developer.p12`
+   - **Set a password** (remember this!)
+   - **Save** and enter your Mac login password when prompted
+
+##### **Step 7: Package for Windows**
+
+**Files to transfer to Windows**:
+- ✅ `WebDriverAgentRunner-Runner.ipa` (signed app)
+- ✅ `developer.p12` (certificate + private key)
+- ✅ `development.mobileprovision` (provisioning profile)
+- 🔐 Certificate password (from export step)
+- 📝 Bundle ID: `com.yourname.WebDriverAgentRunner`
+- 📋 Target device UDIDs (for verification)
+
+**Documentation to include**:
+```
+WebDriverAgent Package Contents:
+- WebDriverAgentRunner-Runner.ipa: Signed app for sideloading
+- developer.p12: Development certificate and private key  
+- development.mobileprovision: Provisioning profile
+- Certificate Password: [YOUR_PASSWORD_HERE]
+- Bundle ID: com.yourname.WebDriverAgentRunner
+- Compatible Device UDIDs: [LIST_YOUR_REGISTERED_DEVICES]
+- Installation: Use Sideloadly, 3uTools, or Apple Configurator 2
+```
+
+**Complete Package Checklist**:
+- [ ] WebDriverAgentRunner-Runner.ipa (signed app binary)
+- [ ] developer.p12 (certificate + private key with password)
+- [ ] .mobileprovision file (development provisioning profile) 
+- [ ] Bundle ID documented (com.yourname.WebDriverAgentRunner)
+- [ ] Device UDIDs verified and documented
+- [ ] Installation instructions provided
 
 #### 📱 **Phase 2: Deployment on Windows (Automation User)**
 
@@ -473,26 +612,332 @@ The default WebDriverAgent uses Facebook's bundle identifier (`com.facebook.WebD
 - ✅ `com.myteam.WebDriverAgentRunner`
 - ❌ `com.facebook.WebDriverAgentRunner` (default, NOT RECOMMENDED)
 
-## 🎮 Using the Control Panel
+## 🎮 Using the Enhanced Control Panel
 
 ### Features Overview
 - 📱 **Device Information**: Shows detected UDID and connection status
-- 📊 **Service Status**: Real-time monitoring of Appium Server, WebDriverAgent, and Device Connection
-- 🎛️ **Control Buttons**: Start/Stop services, Test connections, Refresh devices
-- 🖥️ **Dark Console**: Color-coded logging with professional dark slate theme
+- 📊 **Advanced Service Status**: Real-time monitoring with auto-recovery indicators for:
+  - Appium Server (with health status and recovery attempts)
+  - WebDriverAgent (with connection monitoring and auto-restart)
+  - Device Connection (with reconnection handling)
+  - go-ios Process (with process monitoring and restart)
+- 🎛️ **Enhanced Control Buttons**: 
+  - Start/Stop services with progress indication
+  - Test connections with detailed diagnostics
+  - Refresh devices with auto-detection
+  - Auto-recovery controls (pause/resume, force recovery)
+  - Log export and console management
+- 🖥️ **Professional Dark Console**: Color-coded logging with enhanced themes
+- ⌨️ **Configurable Keyboard Shortcuts**: Fully customizable shortcuts for all actions
+
+### Auto-Recovery System
+The enhanced control panel includes a comprehensive auto-recovery system:
+
+#### **Service Health Monitoring**
+- **Continuous Monitoring**: Each service is monitored every 10-20 seconds
+- **Health States**: Services can be Healthy, Degraded, Failed, Recovering, or Unknown
+- **Visual Indicators**: Real-time status updates with color-coded indicators
+- **Recovery Tracking**: Shows recovery attempts and failure counts
+
+#### **Intelligent Recovery Actions**
+- **Appium Server**: Restart Appium Wizard, kill stuck processes
+- **WebDriverAgent**: Restart port forwarding, restart WDA service
+- **Device Connection**: Refresh connection, restart device services
+- **go-ios Process**: Restart go-ios processes, refresh device list
+
+#### **Recovery Configuration**
+- **Failure Thresholds**: Configurable failure limits before recovery triggers
+- **Backoff Strategy**: Exponential backoff between recovery attempts
+- **Cooldown Periods**: Prevents excessive recovery attempts
+- **Global Limits**: Maximum recovery attempts per service
+
+### Keyboard Shortcuts System
+The panel supports fully configurable keyboard shortcuts:
+
+#### **Default Shortcuts**
+- `Ctrl+L` - Clear console output
+- `F5` - Refresh device list
+- `Ctrl+S` - Start all services
+- `Ctrl+Q` - Stop all services
+- `Ctrl+T` - Test connections
+- `Ctrl+R` - Toggle auto-recovery on/off
+- `Ctrl+Shift+R` - Force recovery for all services
+- `F1` - Show keyboard shortcuts help
+- `Ctrl+M` - Minimize control panel
+- `Ctrl+E` - Export console logs to file
+
+#### **Service-Specific Shortcuts**
+- `Ctrl+1` - Force restart Appium service
+- `Ctrl+2` - Force restart WebDriverAgent
+- `Ctrl+3` - Force device reconnection
+- `Ctrl+4` - Force restart go-ios processes
+
+#### **Console Navigation**
+- `Ctrl+Home` - Scroll console to top
+- `Ctrl+End` - Scroll console to bottom
+- `Ctrl+Plus` - Increase console font size
+- `Ctrl+Minus` - Decrease console font size
+
+#### **Script Execution**
+- `Ctrl+Shift+O` - Run open settings script
+- `Ctrl+Shift+T` - Run connection test script
 
 ### Console Color Coding
 - 🟢 **Green**: Success messages (✅, "successful", "ok")
 - 🔴 **Red**: Error messages (❌, "error", "failed")
 - 🟡 **Yellow**: Warning messages (⚠️, "warning", "timeout")
+- 🟣 **Purple**: Recovery messages (🔧, "recovery", "restart")
 - ⚪ **White**: General information
 - 🔘 **Gray**: Timestamps
 
-### Keyboard Shortcuts
-- `Ctrl+L`: Clear console
-- `F5`: Refresh device list
+### Customizing Shortcuts
+Edit `e2eios/config/shortcuts.json` to customize keyboard shortcuts:
 
-## 🧪 Testing Your Setup
+```json
+{
+  "shortcuts": {
+    "panel_actions": {
+      "your_custom_action": {
+        "key": "Control-y",
+        "description": "Your custom action",
+        "action": "your_action_handler",
+        "enabled": true
+      }
+    }
+  }
+}
+```
+
+### Auto-Recovery Configuration
+The auto-recovery system can be configured by modifying the AutoRecoveryManager settings:
+
+- **Monitoring Intervals**: How often each service is checked
+- **Failure Thresholds**: Number of failures before recovery triggers
+- **Recovery Cooldowns**: Time between recovery attempts
+- **Global Limits**: Maximum recovery attempts per service
+
+## 🔄 Auto-Recovery System
+
+The iOS Automation Boilerplate includes a comprehensive auto-recovery system that monitors service health and automatically restarts failed components.
+
+### **System Architecture**
+
+#### **Service Monitoring**
+The auto-recovery system continuously monitors four key components:
+
+1. **Appium Server** (`http://127.0.0.1:4723`)
+   - HTTP health checks every 10 seconds
+   - Monitors `/status` endpoint availability
+   - Tracks response times and error rates
+
+2. **WebDriverAgent** (`http://127.0.0.1:8200`)
+   - Port connectivity checks every 10 seconds  
+   - Monitors WDA service availability
+   - Tracks port forwarding status
+
+3. **Device Connection**
+   - Device UDID presence checks every 15 seconds
+   - Uses go-ios to validate device connectivity
+   - Monitors USB connection stability
+
+4. **go-ios Process**
+   - Process monitoring every 20 seconds
+   - Checks for running ios.exe processes
+   - Validates process health and responsiveness
+
+#### **Health States**
+Each service can be in one of five states:
+
+- 🟢 **Healthy**: Service operating normally
+- 🟡 **Degraded**: Minor issues detected, monitoring increased
+- 🔴 **Failed**: Service down, recovery triggered
+- 🟣 **Recovering**: Recovery actions in progress
+- ⚪ **Unknown**: Unable to determine service state
+
+#### **Recovery Actions**
+
+**Appium Server Recovery:**
+```
+1. Restart Appium Wizard application
+2. Kill stuck Appium processes (node.exe, appium.exe)
+3. Verify service restoration
+```
+
+**WebDriverAgent Recovery:**
+```
+1. Restart port forwarding (8200 -> 8100)
+2. Kill and restart go-ios processes
+3. Re-establish WDA connection
+4. Restart WDA service if needed
+```
+
+**Device Connection Recovery:**
+```
+1. Refresh device connection via go-ios list
+2. Restart Apple Mobile Device Service
+3. Re-detect device UDID
+4. Validate device trust status
+```
+
+**go-ios Process Recovery:**
+```
+1. Kill existing ios.exe processes
+2. Clean up port forwarding
+3. Restart device monitoring
+```
+
+### **Configuration Options**
+
+#### **Failure Thresholds**
+```python
+# Number of consecutive failures before recovery
+APPIUM_MAX_FAILURES = 3      # 30 seconds of failures
+WDA_MAX_FAILURES = 3         # 30 seconds of failures  
+DEVICE_MAX_FAILURES = 2      # 30 seconds of failures
+GO_IOS_MAX_FAILURES = 2      # 40 seconds of failures
+```
+
+#### **Recovery Limits**
+```python
+GLOBAL_MAX_RECOVERY_ATTEMPTS = 5    # Per service
+RECOVERY_COOLDOWN_MINUTES = 5       # Between attempts
+EXPONENTIAL_BACKOFF = True          # Increasing delays
+```
+
+#### **Monitoring Intervals**
+```python
+APPIUM_CHECK_INTERVAL = 10          # seconds
+WDA_CHECK_INTERVAL = 10             # seconds
+DEVICE_CHECK_INTERVAL = 15          # seconds
+GO_IOS_CHECK_INTERVAL = 20          # seconds
+```
+
+### **Using Auto-Recovery**
+
+#### **Automatic Operation**
+Auto-recovery runs automatically when you start the enhanced control panel:
+
+```bash
+python e2eios\scripts\control_panel.py
+```
+
+The system will:
+- Start monitoring all services immediately
+- Display real-time health status
+- Automatically trigger recovery when failures occur
+- Log all recovery actions to the console
+
+#### **Manual Control**
+You can control auto-recovery manually:
+
+```python
+# Toggle auto-recovery on/off
+Ctrl+R                    # Keyboard shortcut
+# or click "Pause Recovery" button
+
+# Force recovery for all services  
+Ctrl+Shift+R             # Keyboard shortcut
+# or click "Force Recovery" button
+
+# Force recovery for specific services
+Ctrl+1                   # Force Appium restart
+Ctrl+2                   # Force WDA restart
+Ctrl+3                   # Force device reconnection
+Ctrl+4                   # Force go-ios restart
+```
+
+#### **Monitoring Dashboard**
+The control panel shows detailed recovery information:
+
+```
+📊 Service Status & Auto-Recovery
+┌─────────────────┬─────────────┬──────────────────┐
+│ Service         │ Status      │ Recovery Info    │
+├─────────────────┼─────────────┼──────────────────┤
+│ Appium Server   │ ✅ Healthy  │                  │
+│ WebDriverAgent  │ 🔧 Recovery │ Recovery in progress... │
+│ Device Connect  │ ⚠️ Degraded │ Failures: 1      │
+│ go-ios Process  │ ❌ Failed   │ Attempts: 2      │
+└─────────────────┴─────────────┴──────────────────┘
+```
+
+### **Recovery Logs**
+All recovery actions are logged with detailed information:
+
+```
+[10:30:45] 🔄 Auto-recovery system is active and monitoring services
+[10:35:12] ⚠️ WebDriverAgent service degraded (consecutive failures: 2/3)
+[10:35:42] ❌ WebDriverAgent failed - recovery will be attempted
+[10:35:43] 🔧 Auto-recovery started for wda
+[10:35:43] 🔧 Executing recovery action: restart_wda_forward
+[10:35:58] ✅ WebDriverAgent recovered successfully
+```
+
+### **Advanced Configuration**
+
+You can customize auto-recovery behavior by modifying the `AutoRecoveryManager`:
+
+```python
+# In your custom script
+from e2eios.utils.auto_recovery import AutoRecoveryManager
+
+# Initialize with custom settings
+recovery_manager = AutoRecoveryManager(config_path, "MyScript")
+
+# Customize service monitoring
+recovery_manager.services['appium']['check_interval'] = 5  # Check every 5 seconds
+recovery_manager.services['appium']['max_failures'] = 5    # Allow 5 failures
+
+# Add custom recovery actions
+def my_custom_recovery():
+    # Your custom recovery logic
+    return True
+
+recovery_manager.services['appium']['recovery_actions'].append(
+    RecoveryAction(
+        name="my_custom_action",
+        action=my_custom_recovery,
+        max_attempts=3,
+        description="My custom recovery action"
+    )
+)
+
+# Start monitoring
+recovery_manager.start_monitoring()
+```
+
+### **Troubleshooting Auto-Recovery**
+
+#### **Common Issues**
+
+**Recovery Not Triggering:**
+- Check that auto-recovery is enabled (green indicator in panel)
+- Verify service monitoring intervals aren't too long
+- Ensure failure thresholds are appropriate for your setup
+
+**Excessive Recovery Attempts:**
+- Increase failure thresholds to reduce sensitivity
+- Extend recovery cooldown periods
+- Check for underlying infrastructure issues
+
+**Services Not Staying Healthy:**
+- Review service logs in the `logs/` directory
+- Check system resources (CPU, memory)
+- Verify network connectivity and firewall settings
+- Ensure device USB connection is stable
+
+#### **Debug Mode**
+Enable detailed recovery logging:
+
+```python
+# Set debug mode in control panel
+recovery_manager = AutoRecoveryManager(config_path, "Debug")
+recovery_manager.logger.enable_debug = True
+```
+
+This will provide verbose logging of all recovery operations and health checks.
+
+---
 
 ### 1. Verify All Services
 ```bash
