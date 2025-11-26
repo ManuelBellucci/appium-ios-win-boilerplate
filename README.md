@@ -1,5 +1,9 @@
 # 📱 iOS Automation Boilerplate
 
+WARNING: This v1 of the framework is a lite version for run small scale in Windows. Is limited to 5 devices, rely on some unstable tech and lacks of complex architecture. 
+Is a good one to start and save you time to run small automation on windows with ios devices.
+for business inquiries, i use for my customers a pro framework that is highly more advanced and scalable.
+
 > A comprehensive Windows-based iOS automation framework using Appium, WebDriverAgent, and go-ios for seamless iOS app testing and automation. This is a FULLY CUSTOMIZABLE base boilerplate and guide to set-up Appium on Windows. Something may seem hard for someone made so easy. From this, get your UI testing to another level and save time, only updating the scripts and panel.
 
 [![Platform](https://img.shields.io/badge/platform-iOS-blue.svg)](https://developer.apple.com/ios/)
